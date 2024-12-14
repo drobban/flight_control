@@ -16,8 +16,6 @@ defmodule FlightControl do
     GenServer.cast(__MODULE__.Worker, {:subscribe, topic})
   end
 
-
-
   @doc """
   Unsubscribe
 
@@ -31,7 +29,16 @@ defmodule FlightControl do
     GenServer.cast(__MODULE__.Worker, {:unsubscribe, topic})
   end
 
-  def list_topics() do 
+  @doc """
+  List topics
+
+  ## Examples
+
+      iex> FlightControl.list_topics()
+      []
+
+  """
+  def list_topics() do
     GenServer.call(__MODULE__.Worker, :list_topics)
   end
 end
