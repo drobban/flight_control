@@ -1,4 +1,6 @@
 defmodule FlightControl do
+  alias FlightControl.Grid.Square
+  alias FlightControl.Helpers
   @moduledoc """
   Documentation for `FlightControl`.
   """
@@ -40,5 +42,18 @@ defmodule FlightControl do
   """
   def list_topics() do
     GenServer.call(__MODULE__.Worker, :list_topics)
+  end
+
+  @doc """
+  For each topic lat, lng is inside we will return as a list.
+  """
+  def return_topics(lat, lng) do
+    {:ok, topics} = list_topics()
+
+    topics 
+    |> Enum.filter(fn topic -> 
+      {lat1, lng1, lat2, lng2} = Helpers.string_to_lat_lngs(topic)
+      Square.inside?(lat, lng, Square.new(lat1, lng1, lat2, lng2))
+    end)
   end
 end
