@@ -57,4 +57,17 @@ defmodule FlightControl do
       Square.inside?(lat, lng, Square.new(lat1, lng1, lat2, lng2))
     end)
   end
+
+  @doc """
+  broadcast
+  takes a topic and broadcasts message
+  """
+  def broadcast(topic, state) do
+    {:ok, pubsub} = get_pubsub()
+    pubsub.broadcast(FlightTracker.PubSub, topic, state)
+  end
+
+  defp get_pubsub() do
+    GenServer.call(__MODULE__.Worker, :get_pubsub)
+  end
 end

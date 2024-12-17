@@ -5,14 +5,14 @@ defmodule FlightControl.Worker do
   @table_name :radar_stations
 
   # Starts the GenServer and ETS table
-  def start_link(_) do
+  def start_link(%{pubsub: _pubsub} = settings) do
     Logger.debug(inspect(__MODULE__))
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+    GenServer.start_link(__MODULE__, settings, name: __MODULE__)
   end
 
-  def init(_) do
+  def init(%{pubsub: pubsub}) do
     table = :ets.new(@table_name, [:set, :protected, :named_table])
-    {:ok, %{table: table}}
+    {:ok, %{table: table, pubsub: pubsub}}
   end
 
   def handle_cast({:subscribe, topic}, state) do
@@ -46,5 +46,9 @@ defmodule FlightControl.Worker do
   def handle_call(:list_topics, _from, state) do
     topics = :ets.tab2list(state.table) |> Enum.map(fn {topic, _counter} -> topic end)
     {:reply, {:ok, topics}, state}
+  end
+
+  def handle_call(:get_pubsub, _from, state) do
+    {:reply, {:ok, state.pubsub}, state}
   end
 end
